@@ -1,0 +1,16 @@
+{
+  "name": "zhihu-api",
+  "version": "1.0.0",
+  "description": "仿知乎API",
+  "main": "index.js",
+  "author": "lidemin",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "koa": "^2.13.0",
+    "koa-router": "^10.0.0",
+    "nodemon": "^2.0.6"
+  }
+}
