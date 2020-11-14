@@ -75,3 +75,21 @@
 > HTTPS
 > 鉴权
 > 限流
+
+### 什么是控制器
+
+> 拿到路由分配的任务，并执行
+> 获取 HTTP 请求参数
+
+- Query String（查询字符串）,如?q=keywords
+- Router Params（路由参数），如/users/:id
+- Body,如{name:'李雷'}
+- Header,如 Accept、Cookie
+
+> 发送 HTTP 响应
+
+- 发送 Status，如 200/400 等
+- 发送 Body，如{name: '李雷'}
+- 发送 Header
+
+> 可以执行业务逻辑
