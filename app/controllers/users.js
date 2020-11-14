@@ -50,6 +50,12 @@ class UsersCtl {
     const token = jsonwebtoken.sign({ _id, name }, screet, { expiresIn: '1d' })
     ctx.body = { token }
   }
+  async checkOwner(ctx, next) {
+    if (ctx.params.id !== ctx.state.user._id) {
+      ctx.throw(403, '没有权限')
+    }
+    await next()
+  }
 }
 
 module.exports = new UsersCtl()
