@@ -1,6 +1,8 @@
+const path = require('path')
+const koaStatic = require('koa-static')
 const koa = require('koa')
 const error = require('koa-json-error')
-const bodyParser = require('koa-bodyparser')
+const koaBody = require('koa-body')
 const parameter = require('koa-parameter')
 const routing = require('./routes')
 const mongoose = require('mongoose')
@@ -17,8 +19,18 @@ mongoose.connect(
 mongoose.connection.on('error', console.error)
 
 const app = new koa()
-// 解析body参数中间件
-app.use(bodyParser())
+// 注册静态文件
+app.use(koaStatic(path.join(__dirname, 'public')))
+// 注册body中间件，支持上传
+app.use(
+  koaBody({
+    multipart: true,
+    formidable: {
+      uploadDir: path.join(__dirname, '/public/uploads'),
+      keepExtensions: true,
+    },
+  })
+)
 // 校验请求参数
 app.use(parameter(app))
 // 错误处理中间件
