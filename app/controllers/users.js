@@ -3,6 +3,27 @@ const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../config/index')
 
 class UsersCtl {
+  // 校验是否为当前用户
+  async checkOwner(ctx, next) {
+    if (ctx.params.id !== ctx.state.user._id) {
+      ctx.throw(403, '没有权限')
+    }
+    await next()
+  }
+  // 登录
+  async login(ctx) {
+    ctx.verifyParams({
+      name: { type: 'string', required: true },
+      password: { type: 'string', required: true },
+    })
+    const user = await User.findOne(ctx.request.body)
+    if (!user) {
+      ctx.throw(401, '用户名或密码不正确')
+    }
+    const { _id, name } = user
+    const token = jsonwebtoken.sign({ _id, name }, secret, { expiresIn: '1d' })
+    ctx.body = { token }
+  }
   // 查询用户列表
   async find(ctx) {
     ctx.body = await User.find()
@@ -65,27 +86,6 @@ class UsersCtl {
     }
     ctx.body = user
   }
-  // 登录
-  async login(ctx) {
-    ctx.verifyParams({
-      name: { type: 'string', required: true },
-      password: { type: 'string', required: true },
-    })
-    const user = await User.findOne(ctx.request.body)
-    if (!user) {
-      ctx.throw(401, '用户名或密码不正确')
-    }
-    const { _id, name } = user
-    const token = jsonwebtoken.sign({ _id, name }, secret, { expiresIn: '1d' })
-    ctx.body = { token }
-  }
-  //
-  async checkOwner(ctx, next) {
-    if (ctx.params.id !== ctx.state.user._id) {
-      ctx.throw(403, '没有权限')
-    }
-    await next()
-  }
   // 获取某个人的关注列表
   async listFollowing(ctx) {
     const user = await User.findById(ctx.params.id)
@@ -103,6 +103,14 @@ class UsersCtl {
       ctx.throw(404)
     }
     ctx.body = user
+  }
+  // 校验用户是否存在
+  async checkUserExist(ctx, next) {
+    const user = User.findById(ctx.params.id)
+    if (!user) {
+      ctx.throw(404, '用户不存在！')
+    }
+    next()
   }
   // 关注
   async follow(ctx) {
