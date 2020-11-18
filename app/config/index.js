@@ -1,5 +1,4 @@
 module.exports = {
-  connectStr:
-    'mongodb+srv://zhihu:12345123@zhihu.syeuj.mongodb.net/<dbname>?retryWrites=true&w=majority',
+  connectStr: 'mongodb://127.0.0.1:27017/zhihu',
   secret: 'zhihu',
 }

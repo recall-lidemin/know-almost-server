@@ -16,6 +16,7 @@ mongoose.connect(
     console.log('MongoDB连接成功！')
   }
 )
+mongoose.set('useFindAndModify', false)
 mongoose.connection.on('error', console.error)
 
 const app = new koa()
