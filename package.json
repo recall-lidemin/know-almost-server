@@ -11,6 +11,7 @@
     "start:prod": "cross-env NODE_ENV=production app/index.js"
   },
   "dependencies": {
+    "babel-eslint": "^10.1.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",

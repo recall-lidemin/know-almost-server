@@ -14,17 +14,25 @@ const userSchema = new Schema({
     required: true,
   }, // 性别
   headline: { type: String }, // 个人描述
-  locations: { type: [{ type: String }], select: false }, // 地址
-  business: { type: String, select: false }, // 行业
+  locations: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Topic' }],
+    select: false,
+  }, // 地址
+  business: { type: Schema.Types.ObjectId, ref: 'Topic', select: false }, // 行业
   employments: {
-    type: [{ company: { type: String }, job: { type: String } }],
+    type: [
+      {
+        company: { type: Schema.Types.ObjectId, ref: 'Topic' },
+        job: { type: Schema.Types.ObjectId, ref: 'Topic' },
+      },
+    ],
     select: false,
   }, // 职业经历
   educations: {
     type: [
       {
-        school: { type: String },
-        major: { type: String },
+        school: { type: Schema.Types.ObjectId, ref: 'Topic' },
+        major: { type: Schema.Types.ObjectId, ref: 'Topic' },
         diploma: { type: Number, enum: [1, 2, 3, 4, 5] },
         entrance_year: { type: Number },
         graduation_year: { type: Number },
@@ -36,6 +44,10 @@ const userSchema = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     select: false,
   }, // 关注我的
+  followingTopics: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Topic' }],
+    select: false,
+  }, // 关注的话题
 })
 
 module.exports = model('User', userSchema)

@@ -26,20 +26,37 @@ class UsersCtl {
   }
   // 查询用户列表
   async find(ctx) {
-    ctx.body = await User.find()
+    const { per_page = 2, page: pageNo } = ctx.query
+    const page = Math.max(pageNo * 1, 1) - 1
+    const perPage = Math.max(per_page * 1, 1)
+    ctx.body = await User.find({ name: new RegExp(ctx.query.q) })
+      .limit(perPage) // 限制每页显示perPage项
+      .skip(page * perPage) // 跳过多少页显示perPage项
   }
   // 根据id查询某个用户信息
   async findById(ctx) {
-    const { fields } = ctx.query
-    const selectFields =
-      fields &&
-      fields
-        .split(';')
-        .filter((f) => f)
-        .map((f) => '+' + f)
-        .join('')
-
-    const user = await User.findById(ctx.params.id).select(selectFields)
+    const { fields = '' } = ctx.query
+    const selectFields = fields
+      .split(';')
+      .filter((f) => f)
+      .map((f) => '+' + f)
+      .join('')
+    const populateStr = fields
+      .split(';')
+      .filter((f) => f)
+      .map((f) => {
+        if (f === 'employments') {
+          return 'employments.company employments.job'
+        }
+        if (f === 'educations') {
+          return 'educations.school educations.major'
+        }
+        return f
+      })
+      .join(' ')
+    const user = await User.findById(ctx.params.id)
+      .select(selectFields)
+      .populate(populateStr)
     if (!user) {
       ctx.throw(404, '用户不存在')
     }
@@ -130,6 +147,43 @@ class UsersCtl {
       me.save()
     }
     ctx.status = 204
+  }
+  // 关注话题
+  async followTopic(ctx) {
+    const me = await User.findById(ctx.state.user._id).select(
+      '+followingTopics'
+    )
+    if (
+      !me.followingTopics.map((id) => id.toString()).includes(ctx.params.id)
+    ) {
+      me.followingTopics.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 204
+  }
+  // 取消关注话题
+  async unfollowTopic(ctx) {
+    const me = await User.findById(ctx.state.user._id).select(
+      '+followingTopics'
+    )
+    const index = me.followingTopics
+      .map((id) => id.toString())
+      .indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
+  // 获取用户关注的话题
+  async listFollowingTopics(ctx) {
+    const user = await User.findById(ctx.params.id)
+      .select('+followingTopics')
+      .populate('followingTopics')
+    if (!user) {
+      ctx.throw(404)
+    }
+    ctx.body = user.followingTopics
   }
 }
 
