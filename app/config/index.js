@@ -1,4 +1,4 @@
 module.exports = {
-  connectStr: 'mongodb://127.0.0.1:27017/zhihu',
+  connectStr: '自己的',
   secret: 'zhihu',
 }
